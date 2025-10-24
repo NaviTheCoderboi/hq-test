@@ -30,6 +30,12 @@ jobs:
               run: |
                   pacman --noconfirm -Syu cmake gcc git xorg-server-xvfb xorg-xwd openssh tmate dbus python gtk4 libadwaita webkitgtk-6.0
 
+            - name: Update system(windows)
+              if: matrix.os == 'windows-latest'
+              run: |
+                  choco upgrade all -y
+                  refreshenv
+
             - name: Configure (CMake)
               run: cmake -B build -DCMAKE_BUILD_TYPE=Release -Dsaucer_backend=${{ matrix.backend }}
 
