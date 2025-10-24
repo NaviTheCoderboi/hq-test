@@ -29,9 +29,9 @@ jobs:
             - name: Setup build dependencies (Arch)
               if: matrix.container == 'archlinux:base-devel'
               run: |
-                  pacman --noconfirm -Syu cmake gcc git xorg-server-xvfb xorg-xwd openssh tmate dbus python gtk4 libadwaita webkitgtk-6.0 nodejs
+                  pacman --noconfirm -Syu cmake gcc git xorg-server-xvfb xorg-xwd openssh tmate dbus python gtk4 libadwaita webkitgtk-6.0 nodejs npm
 
-            - name: Update system(windows)
+            - name: Setup build dependencies (Windows)
               if: matrix.os == 'windows-latest'
               run: |
                   choco upgrade cmake --install-arguments='"ADD_CMAKE_TO_PATH=System"' -y
@@ -39,7 +39,7 @@ jobs:
                   refreshenv
               shell: powershell
 
-            - name: setup nodejs
+            - name: Build(frontend)
               run: |
                   npm install -g pnpm
                   pnpm install
@@ -48,7 +48,7 @@ jobs:
             - name: Configure (CMake)
               run: cmake -B build -DCMAKE_BUILD_TYPE=Release -Dsaucer_backend=${{ matrix.backend }}
 
-            - name: Build
+            - name: Build(CMake)
               run: cmake --build build --config Release --parallel
 
             - name: Package with CPack

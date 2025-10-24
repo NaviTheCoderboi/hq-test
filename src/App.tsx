@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import Home from './components/tabs/Home.tsx';
 import Sessions from './components/tabs/Sessions.tsx';
 import Stats from './components/tabs/Stats.tsx';
