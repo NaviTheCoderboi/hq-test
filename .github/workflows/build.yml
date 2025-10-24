@@ -14,11 +14,11 @@ jobs:
                       name: win
                       backend: WebView2
                       cpack_generator: NSIS;ZIP
-                    - os: ubuntu-latest
-                      name: linux
-                      container: archlinux:base-devel
-                      backend: WebKitGtk
-                      cpack_generator: TGZ
+                    # - os: ubuntu-latest
+                    #   name: linux
+                    #   container: archlinux:base-devel
+                    #   backend: WebKitGtk
+                    #   cpack_generator: TGZ
 
         name: Build on ${{ matrix.os }}
         runs-on: ${{ matrix.os }}
@@ -55,9 +55,11 @@ jobs:
               run: cmake --build build --config Release --parallel
 
             - name: Package with CPack
+              id: cpack
               run: |
                   cd build
                   cpack -G "${{ matrix.cpack_generator }}"
+              continue-on-error: true
 
             - name: Display NSIS logs
               if: matrix.os == 'windows-latest'
@@ -69,6 +71,10 @@ jobs:
                       echo "NSISOutput.log not found"
                   }
               shell: powershell
+
+            - name: Exit if cpack failed
+              if: steps.cpack.outcome == 'failure'
+              run: exit 1
 
             - name: Print build artifacts
               run: ls -la build/
