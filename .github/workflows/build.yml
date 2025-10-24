@@ -1,0 +1,51 @@
+name: Build
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    build:
+        name: Build on ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                include:
+                    - os: windows-latest
+                      backend: WebView2
+                      cpack_generator: NSIS;ZIP
+                    - os: ubuntu-latest
+                      container: archlinux:base-devel
+                      backend: WebKitGtk
+                      cpack_generator: TGZ
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup build dependencies (Arch)
+              if: matrix.container == 'archlinux:base-devel'
+              run: |
+                  pacman --noconfirm -Syu cmake gcc git xorg-server-xvfb xorg-xwd openssh tmate dbus python gtk4 libadwaita webkitgtk-6.0
+
+            - name: Configure (CMake)
+              run: cmake -B build -DCMAKE_BUILD_TYPE=Release -Dsaucer_backend=${{ matrix.backend }}
+
+            - name: Build
+              run: cmake --build build --config Release --parallel
+
+            - name: Package with CPack
+              run: |
+                  cd build
+                  cpack -G "${{ matrix.cpack_generator }}"
+
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ${{ matrix.artifact_name }}
+                  path: |
+                      build/TheHQProject-*.exe
+                      build/TheHQProject-*.zip
+                      build/TheHQProject-*.tar.gz
+                  if-no-files-found: error
+                  retention-days: 90
