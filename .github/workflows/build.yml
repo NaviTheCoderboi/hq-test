@@ -56,6 +56,9 @@ jobs:
                   cd build
                   cpack -G "${{ matrix.cpack_generator }}"
 
+            - name: Print build artifacts
+              run: ls -la build/
+
             - name: Upload artifacts
               uses: actions/upload-artifact@v4
               with:
