@@ -78,7 +78,7 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 if (WIN32)
     set(CPACK_GENERATOR "ZIP;NSIS")
 
-    set(CPACK_NSIS_DISPLAY_NAME )
+    set(CPACK_NSIS_DISPLAY_NAME "${PROJECT_NAME}")
     set(CPACK_NSIS_HELP_LINK "https://github.com/saucer/saucer")
     set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/saucer/saucer")
     set(CPACK_NSIS_CONTACT "${CPACK_PACKAGE_CONTACT}")
