@@ -36,6 +36,7 @@ jobs:
               run: |
                   choco upgrade cmake --install-arguments='"ADD_CMAKE_TO_PATH=System"' -y
                   choco install nodejs-lts -y
+                  choco install nsis -y
                   refreshenv
               shell: powershell
 
@@ -62,7 +63,7 @@ jobs:
             - name: Upload artifacts
               uses: actions/upload-artifact@v4
               with:
-                  name: ${{ matrix.artifact_name }}
+                  name: TheHQProject-${{ matrix.os }}-${{ github.sha }}
                   path: |
                       build/TheHQProject-*.exe
                       build/TheHQProject-*.zip
