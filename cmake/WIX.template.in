@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?include "cpack_variables.wxi"?>
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+     RequiredVersion="3.6.3303.0">
+
+    <Product Id="$(var.CPACK_WIX_PRODUCT_GUID)"
+             Name="$(var.CPACK_PACKAGE_NAME)"
+             Language="1033"
+             Version="$(var.CPACK_PACKAGE_VERSION)"
+             Manufacturer="$(var.CPACK_PACKAGE_VENDOR)"
+             UpgradeCode="$(var.CPACK_WIX_UPGRADE_GUID)">
+
+        <Package InstallerVersion="301" Compressed="yes" InstallScope="perMachine" />
+
+        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+        <!-- Product Icon -->
+        <Icon Id="ProductIcon.ico" SourceFile="$(var.CPACK_WIX_PRODUCT_ICON)" />
+        <Property Id="ARPPRODUCTICON" Value="ProductIcon.ico" />
+        
+        <!-- Add/Remove Programs properties -->
+        <Property Id="ARPHELPLINK" Value="$(var.CPACK_WIX_PROPERTY_ARPHELPLINK)" />
+        <Property Id="ARPURLINFOABOUT" Value="$(var.CPACK_WIX_PROPERTY_ARPURLINFOABOUT)" />
+        <Property Id="ARPCONTACT" Value="$(var.CPACK_WIX_PROPERTY_ARPCONTACT)" />
+
+        <!-- Check for WebView2 Runtime -->
+        <Property Id="WEBVIEW2INSTALLED">
+            <RegistrySearch Id="WebView2RegSearch"
+                            Root="HKLM"
+                            Key="SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}"
+                            Name="pv"
+                            Type="raw" />
+        </Property>
+
+        <!-- WebView2 not found warning condition -->
+        <Condition Message="Warning: Microsoft Edge WebView2 Runtime is not detected. $(var.CPACK_PACKAGE_NAME) requires WebView2 to run properly. You can download it from: https://go.microsoft.com/fwlink/p/?LinkId=2124703">
+            <![CDATA[Installed OR WEBVIEW2INSTALLED OR SKIPWEBVIEW2CHECK]]>
+        </Condition>
+
+        <!-- Allow users to skip WebView2 check via command line: msiexec /i installer.msi SKIPWEBVIEW2CHECK=1 -->
+        <Property Id="SKIPWEBVIEW2CHECK" Value="0" />
+
+        <!-- Major upgrade handling -->
+        <MajorUpgrade
+            Schedule="afterInstallInitialize"
+            DowngradeErrorMessage="A newer version of [ProductName] is already installed. Setup will now exit."
+            AllowSameVersionUpgrades="yes" />
+
+        <!-- UI Configuration -->
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALL_ROOT" />
+        <UIRef Id="WixUI_InstallDir" />
+        <UIRef Id="WixUI_ErrorProgressText" />
+
+        <!-- Custom welcome message with WebView2 info -->
+        <WixVariable Id="WixUILicenseRtf" Value="$(var.CPACK_RESOURCE_FILE_LICENSE)" />
+        
+        <!-- Desktop folder reference for shortcuts -->
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="DesktopFolder" Name="Desktop" />
+            <Directory Id="ProgramMenuFolder" Name="Programs">
+                <Directory Id="ApplicationProgramsFolder" Name="$(var.CPACK_WIX_PROGRAM_MENU_FOLDER)" />
+            </Directory>
+        </Directory>
+
+        <!-- Launch application after install -->
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch $(var.CPACK_PACKAGE_NAME)" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+        <CustomAction Id="LaunchApplication"
+                      Directory="CM_DP_bin"
+                      ExeCommand="[CM_DP_bin]TheHQProject.exe"
+                      Return="asyncNoWait" />
+
+        <InstallExecuteSequence>
+            <Custom Action="LaunchApplication" After="InstallFinalize">
+                (NOT Installed) AND (NOT REMOVE) AND (WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1)
+            </Custom>
+        </InstallExecuteSequence>
+
+        <?include "properties.wxi"?>
+        <?include "product_fragment.wxi"?>
+
+    </Product>
+</Wix>

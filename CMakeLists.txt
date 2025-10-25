@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 4.0 )
 
 set(PROJECT_NAME "TheHQProject")
 set(PROJECT_VERSION "1.0.0")
+set(PROJECT_ICON "${CMAKE_SOURCE_DIR}/assets/logo.ico")
+set(PROJECT_DESCRIPTION "a study time tracker application")
 project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 23)
@@ -72,53 +74,24 @@ set(CPACK_PACKAGE_CONTACT "https://github.com/NaviTheCoderboi")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "a study time tracker application")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_INSTALL_DIRECTORY ${PROJECT_NAME})
-
+set(CPACK_PACKAGE_ICON ${PROJECT_ICON})
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 
 if (WIN32)
-    set(CPACK_GENERATOR "ZIP;NSIS")
+    set(CPACK_GENERATOR "ZIP;WIX")
 
-    set(CPACK_NSIS_DISPLAY_NAME "${PROJECT_NAME}")
-    set(CPACK_NSIS_HELP_LINK "https://github.com/saucer/saucer")
-    set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/saucer/saucer")
-    set(CPACK_NSIS_CONTACT "${CPACK_PACKAGE_CONTACT}")
-    set(CPACK_NSIS_MODIFY_PATH ON)
-    set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+    set(CPACK_WIX_UPGRADE_GUID "A1B2C3D4-E5F6-4789-A1B2-C3D4E5F67890")
 
-    set(CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS "
-        ; Check if WebView2 is installed
-        ClearErrors
-        ReadRegStr $0 HKLM 'SOFTWARE\\\\WOW6432Node\\\\Microsoft\\\\EdgeUpdate\\\\Clients\\\\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}' 'pv'
-        IfErrors webview2_missing webview2_ok
-        
-        webview2_missing:
-            MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION 'Warning: Microsoft Edge WebView2 Runtime is not installed.$\\n$\\n${PROJECT_NAME} requires WebView2 to run.$\\n$\\nClick OK to continue installation (you can install WebView2 later).$\\nClick Cancel to abort installation.' IDOK continue IDCANCEL abort
-            abort:
-                Abort 'Installation cancelled by user.'
-            continue:
-                DetailPrint 'WebView2 not found - user will need to install manually'
-                Goto done
-        
-        webview2_ok:
-            DetailPrint 'WebView2 Runtime detected (version $0)'
-        
-        done:
-    ")
+    set(CPACK_WIX_PRODUCT_ICON "${PROJECT_ICON}")
+    set(CPACK_WIX_PROPERTY_ARPHELPLINK "https://github.com/saucer/saucer")
+    set(CPACK_WIX_PROPERTY_ARPURLINFOABOUT "https://github.com/saucer/saucer")
+    set(CPACK_WIX_PROPERTY_ARPCONTACT "${CPACK_PACKAGE_CONTACT}")
 
-    set(CPACK_NSIS_MUI_FINISHPAGE_RUN_TEXT "Launch ${PROJECT_NAME}")
-    set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
-        WriteINIStr '$INSTDIR\\\\webview2_info.url' 'InternetShortcut' 'URL' 'https://go.microsoft.com/fwlink/p/?LinkId=2124703'
-    ")
+    set(CPACK_WIX_LICENSE_RTF "${CMAKE_SOURCE_DIR}/assets/LICENSE.rtf")
+    set(CPACK_WIX_PROGRAM_MENU_FOLDER "${PROJECT_NAME}")
 
-    set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/assets/logo.ico")
-    set(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}/assets/logo.ico")
-
-    set(CPACK_NSIS_MENU_LINKS "${PROJECT_NAME}" "${PROJECT_NAME}")
-
-    set(CPACK_NSIS_CREATE_ICONS_EXTRA
-        "CreateShortCut \\\"$DESKTOP\\\\${PROJECT_NAME}.lnk\\\" \\\"$INSTDIR\\\\${PROJECT_NAME}.exe\\\"")
-    set(CPACK_NSIS_DELETE_ICONS_EXTRA
-        "Delete \\\"$DESKTOP\\\\${PROJECT_NAME}.lnk\\\"")
+    set(CPACK_WIX_PATCH_FILE "${CMAKE_SOURCE_DIR}/cmake/wix_patch.xml")
+    set(CPACK_WIX_TEMPLATE "${CMAKE_SOURCE_DIR}/cmake/WIX.template.in")
 elseif(APPLE)
     set(CPACK_GENERATOR "DragNDrop")
     set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
