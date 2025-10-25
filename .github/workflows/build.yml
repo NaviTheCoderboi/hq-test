@@ -14,11 +14,11 @@ jobs:
                       name: win
                       backend: WebView2
                       cpack_generator: NSIS;ZIP
-                    # - os: ubuntu-latest
-                    #   name: linux
-                    #   container: archlinux:base-devel
-                    #   backend: WebKitGtk
-                    #   cpack_generator: TGZ
+                    - os: ubuntu-latest
+                      name: linux
+                      container: archlinux:base-devel
+                      backend: WebKitGtk
+                      cpack_generator: TGZ
 
         name: Build on ${{ matrix.os }}
         runs-on: ${{ matrix.os }}
@@ -95,7 +95,7 @@ jobs:
               with:
                   name: TheHQProject-${{ matrix.name }}
                   path: |
-                      build/TheHQProject-*.msi
+                      build/TheHQProject-*.exe
                       build/TheHQProject-*.zip
                       build/TheHQProject-*.tar.gz
                   if-no-files-found: error
