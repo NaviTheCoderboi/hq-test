@@ -71,8 +71,8 @@ jobs:
                   cpack -G "${{ matrix.cpack_generator }}"
               continue-on-error: true
 
-            - name: Display WiX logs (if failed)
-              if: failure() && matrix.os == 'windows-latest' && steps.cpack.outcome == 'failure'
+            - name: Display WiX logs
+              if: matrix.os == 'windows-latest'
               run: |
                   echo "=== WiX Output Log ==="
                   if (Test-Path "build/_CPack_Packages/win64/WIX") {

@@ -90,7 +90,6 @@ if (WIN32)
     set(CPACK_WIX_LICENSE_RTF "${CMAKE_SOURCE_DIR}/assets/LICENSE.rtf")
     set(CPACK_WIX_PROGRAM_MENU_FOLDER "${PROJECT_NAME}")
 
-    set(CPACK_WIX_PATCH_FILE "${CMAKE_SOURCE_DIR}/cmake/wix_patch.xml")
     set(CPACK_WIX_TEMPLATE "${CMAKE_SOURCE_DIR}/cmake/WIX.template.in")
 elseif(APPLE)
     set(CPACK_GENERATOR "DragNDrop")
