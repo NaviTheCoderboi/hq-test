@@ -93,8 +93,10 @@ if (WIN32)
     set(CPACK_NSIS_MODIFY_PATH OFF)
     set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
     
-    set(CPACK_NSIS_MUI_ICON "${PROJECT_ICON}")
-    set(CPACK_NSIS_MUI_UNIICON "${PROJECT_ICON}")
+    if(EXISTS "${PROJECT_ICON}")
+        set(CPACK_NSIS_MUI_ICON "${PROJECT_ICON}")
+        set(CPACK_NSIS_MUI_UNIICON "${PROJECT_ICON}")
+    endif()
     
     set(CPACK_NSIS_CREATE_ICONS_EXTRA
         "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\${PROJECT_NAME}.lnk' '$INSTDIR\\\\bin\\\\${PROJECT_NAME}.exe'
@@ -104,29 +106,18 @@ if (WIN32)
          Delete '$DESKTOP\\\\${PROJECT_NAME}.lnk'")
     
     set(CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS "
-        ; Check if WebView2 is installed
         ClearErrors
         ReadRegStr $0 HKLM 'SOFTWARE\\\\WOW6432Node\\\\Microsoft\\\\EdgeUpdate\\\\Clients\\\\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}' 'pv'
         IfErrors webview2_missing webview2_ok
-        
         webview2_missing:
-            MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
-                'Warning: Microsoft Edge WebView2 Runtime is not installed.$\\n$\\n\
-                ${PROJECT_NAME} requires WebView2 to run properly.$\\n$\\n\
-                Download WebView2 from:$\\n\
-                https://go.microsoft.com/fwlink/p/?LinkId=2124703$\\n$\\n\
-                Click OK to continue installation anyway.$\\n\
-                Click Cancel to abort installation.' \
-                IDOK continue IDCANCEL abort
+            MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION 'Warning: Microsoft Edge WebView2 Runtime is not installed.$\\\\n$\\\\n${PROJECT_NAME} requires WebView2 to run properly.$\\\\n$\\\\nDownload from: https://go.microsoft.com/fwlink/p/?LinkId=2124703$\\\\n$\\\\nClick OK to continue installation anyway.' IDOK continue IDCANCEL abort
             abort:
                 Abort 'Installation cancelled by user.'
             continue:
                 DetailPrint 'WebView2 not found - user chose to continue'
                 Goto done
-        
         webview2_ok:
             DetailPrint 'WebView2 Runtime detected (version: $0)'
-        
         done:
     ")
     
