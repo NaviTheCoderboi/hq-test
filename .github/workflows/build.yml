@@ -62,7 +62,7 @@ jobs:
               continue-on-error: true
 
             - name: Display NSIS logs (Windows)
-              if: matrix.os == 'windows-latest'
+              if: matrix.os == 'windows-latest' && steps.cpack.outcome == 'failure'
               run: |
                   echo "=== NSIS Output Log ==="
                   if (Test-Path "build/_CPack_Packages/win64/NSIS/NSISOutput.log") {
@@ -89,9 +89,6 @@ jobs:
             - name: Exit if cpack failed
               if: steps.cpack.outcome == 'failure'
               run: exit 1
-
-            - name: Print build artifacts
-              run: ls -la build/
 
             - name: Upload artifacts
               uses: actions/upload-artifact@v4
