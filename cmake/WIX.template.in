@@ -18,13 +18,23 @@
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
         <!-- Product Icon -->
+        <?ifdef CPACK_WIX_PRODUCT_ICON?>
         <Icon Id="ProductIcon.ico" SourceFile="$(var.CPACK_WIX_PRODUCT_ICON)" />
         <Property Id="ARPPRODUCTICON" Value="ProductIcon.ico" />
+        <?endif?>
         
-        <!-- Add/Remove Programs properties -->
+        <!-- Add/Remove Programs properties (with conditional checks) -->
+        <?ifdef CPACK_WIX_PROPERTY_ARPHELPLINK?>
         <Property Id="ARPHELPLINK" Value="$(var.CPACK_WIX_PROPERTY_ARPHELPLINK)" />
+        <?endif?>
+        
+        <?ifdef CPACK_WIX_PROPERTY_ARPURLINFOABOUT?>
         <Property Id="ARPURLINFOABOUT" Value="$(var.CPACK_WIX_PROPERTY_ARPURLINFOABOUT)" />
+        <?endif?>
+        
+        <?ifdef CPACK_WIX_PROPERTY_ARPCONTACT?>
         <Property Id="ARPCONTACT" Value="$(var.CPACK_WIX_PROPERTY_ARPCONTACT)" />
+        <?endif?>
 
         <!-- Check for WebView2 Runtime -->
         <Property Id="WEBVIEW2INSTALLED">
@@ -54,14 +64,18 @@
         <UIRef Id="WixUI_InstallDir" />
         <UIRef Id="WixUI_ErrorProgressText" />
 
-        <!-- Custom welcome message with WebView2 info -->
+        <!-- License file -->
+        <?ifdef CPACK_RESOURCE_FILE_LICENSE?>
         <WixVariable Id="WixUILicenseRtf" Value="$(var.CPACK_RESOURCE_FILE_LICENSE)" />
+        <?endif?>
         
         <!-- Desktop folder reference for shortcuts -->
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="DesktopFolder" Name="Desktop" />
             <Directory Id="ProgramMenuFolder" Name="Programs">
+                <?ifdef CPACK_WIX_PROGRAM_MENU_FOLDER?>
                 <Directory Id="ApplicationProgramsFolder" Name="$(var.CPACK_WIX_PROGRAM_MENU_FOLDER)" />
+                <?endif?>
             </Directory>
         </Directory>
 
