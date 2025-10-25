@@ -13,7 +13,7 @@ jobs:
                     - os: windows-latest
                       name: win
                       backend: WebView2
-                      cpack_generator: WIX;ZIP
+                      cpack_generator: NSIS;ZIP
                     # - os: ubuntu-latest
                     #   name: linux
                     #   container: archlinux:base-devel
@@ -37,19 +37,9 @@ jobs:
               if: matrix.os == 'windows-latest'
               run: |
                   choco upgrade cmake --install-arguments='"ADD_CMAKE_TO_PATH=System"' -y
-                  choco install wixtoolset -y
+                  choco install nsis -y
                   choco install nodejs-lts -y
                   refreshenv
-              shell: powershell
-
-            - name: Verify WiX installation(Windows)
-              if: matrix.os == 'windows-latest'
-              run: |
-                  $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-                  Write-Host "WiX candle.exe location:"
-                  Get-Command candle.exe -ErrorAction SilentlyContinue
-                  Write-Host "WiX light.exe location:"
-                  Get-Command light.exe -ErrorAction SilentlyContinue
               shell: powershell
 
             - name: Build(frontend)
@@ -71,24 +61,30 @@ jobs:
                   cpack -G "${{ matrix.cpack_generator }}"
               continue-on-error: true
 
-            - name: Display WiX logs
+            - name: Display NSIS logs (Windows)
               if: matrix.os == 'windows-latest'
               run: |
-                  echo "=== WiX Output Log ==="
-                  if (Test-Path "build/_CPack_Packages/win64/WIX") {
-                      Get-ChildItem -Recurse "build/_CPack_Packages/win64/WIX" -Filter "*.log" | ForEach-Object {
-                          Write-Host "=== $($_.Name) ==="
-                          Get-Content $_.FullName
-                      }
+                  echo "=== NSIS Output Log ==="
+                  if (Test-Path "build/_CPack_Packages/win64/NSIS/NSISOutput.log") {
+                      Write-Host "--- NSISOutput.log ---"
+                      Get-Content "build/_CPack_Packages/win64/NSIS/NSISOutput.log"
                   } else {
-                      echo "WIX directory not found"
+                      echo "NSISOutput.log not found"
                   }
+
                   echo ""
-                  echo "=== All CPack files ==="
-                  if (Test-Path "build/_CPack_Packages") {
-                      Get-ChildItem -Recurse "build/_CPack_Packages"
+                  echo "=== NSIS Generated Files ==="
+                  if (Test-Path "build/_CPack_Packages/win64/NSIS") {
+                      Get-ChildItem -Recurse "build/_CPack_Packages/win64/NSIS" -File | Select-Object FullName, Length, LastWriteTime | Format-Table -AutoSize
+                  }
+
+                  echo ""
+                  echo "=== NSIS project.nsi (first 100 lines) ==="
+                  if (Test-Path "build/_CPack_Packages/win64/NSIS/project.nsi") {
+                      Get-Content "build/_CPack_Packages/win64/NSIS/project.nsi" -TotalCount 100
                   }
               shell: powershell
+              continue-on-error: true
 
             - name: Exit if cpack failed
               if: steps.cpack.outcome == 'failure'
