@@ -13,7 +13,7 @@ jobs:
                     - os: windows-latest
                       name: win
                       backend: WebView2
-                      cpack_generator: NSIS;ZIP
+                      cpack_generator: NSIS
                     - os: ubuntu-latest
                       name: linux
                       container: archlinux:base-devel
@@ -96,7 +96,6 @@ jobs:
                   name: TheHQProject-${{ matrix.name }}
                   path: |
                       build/TheHQProject-*.exe
-                      build/TheHQProject-*.zip
                       build/TheHQProject-*.tar.gz
                   if-no-files-found: error
                   retention-days: 90
